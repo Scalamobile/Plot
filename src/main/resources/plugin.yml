@@ -1,0 +1,39 @@
+name: Plot
+version: ${project.version}
+main: com.scala.plot.PlotPlugin
+api-version: '1.21'
+author: scala
+description: Plot management plugin with custom world generation
+load: STARTUP
+
+commands:
+  plot:
+    description: Main plot command
+    usage: /plot <claim|tp|info|add|remove|flag|reset>
+    aliases: [p]
+
+permissions:
+  plot.claim:
+    description: Allows claiming plots
+    default: true
+  plot.tp:
+    description: Allows teleporting to your plot
+    default: true
+  plot.info:
+    description: Allows viewing plot info
+    default: true
+  plot.add:
+    description: Allows adding players to plots
+    default: true
+  plot.remove:
+    description: Allows removing players from plots
+    default: true
+  plot.flag:
+    description: Allows setting plot flags
+    default: true
+  plot.reset:
+    description: Allows resetting plots
+    default: true
+  plot.admin:
+    description: Admin permissions for plots
+    default: op
