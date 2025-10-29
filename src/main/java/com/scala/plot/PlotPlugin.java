@@ -4,8 +4,10 @@ import com.scala.plot.commands.PlotCommand;
 import com.scala.plot.generator.PlotWorldGenerator;
 import com.scala.plot.listeners.PlayerMoveListener;
 import com.scala.plot.listeners.BlockListener;
+import com.scala.plot.listeners.VoidListener;
 import com.scala.plot.listeners.WorldListener;
 import com.scala.plot.managers.PlotManager;
+import com.scala.plot.VersionChecker;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -17,6 +19,7 @@ public class PlotPlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+
         
         // Print banner
         getLogger().info("");
@@ -30,7 +33,10 @@ public class PlotPlugin extends JavaPlugin {
         getLogger().info("Version: " + getDescription().getVersion());
         getLogger().info("Author: " + getDescription().getAuthors().get(0));
         getLogger().info("");
-        
+
+        //check version
+        VersionChecker.checkVersion();
+
         // Initialize managers
         plotManager = new PlotManager(this);
         
@@ -43,6 +49,7 @@ public class PlotPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerMoveListener(this), this);
         getServer().getPluginManager().registerEvents(new BlockListener(this), this);
         getServer().getPluginManager().registerEvents(new WorldListener(this), this);
+        getServer().getPluginManager().registerEvents(new VoidListener(this), this);
         
         // Configure main world if already loaded
         if (getServer().getWorld("world") != null) {
