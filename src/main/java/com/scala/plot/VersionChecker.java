@@ -22,7 +22,7 @@ public class VersionChecker {
 
             //System.out.println(response.body)
 
-            if (!response.body().equals("1.1.0")) {
+            if (!response.body().equals("1.1.1")) {
                 getLogger().warning("[Plot] Update available! Install it from: https://modrinth.com/plugin/plot");
             } else {
                 getLogger().info("[Plot] No update avaiable!");

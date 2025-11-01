@@ -10,6 +10,7 @@ import com.scala.plot.managers.PlotManager;
 import com.scala.plot.VersionChecker;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bstats.bukkit.Metrics;
 
 public class PlotPlugin extends JavaPlugin {
     
@@ -36,6 +37,10 @@ public class PlotPlugin extends JavaPlugin {
 
         //check version
         VersionChecker.checkVersion();
+
+        // Initialize bStats metrics
+        int pluginId = 27812;
+        Metrics metrics = new Metrics(this, pluginId);
 
         // Initialize managers
         plotManager = new PlotManager(this);
