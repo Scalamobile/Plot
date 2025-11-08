@@ -8,18 +8,31 @@ import com.scala.plot.listeners.VoidListener;
 import com.scala.plot.listeners.WorldListener;
 import com.scala.plot.managers.PlotManager;
 import com.scala.plot.VersionChecker;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bstats.bukkit.Metrics;
+import com.scala.scalaAnalytics.AnalyticsManager;
+
 
 public class PlotPlugin extends JavaPlugin {
-    
+
+    private AnalyticsManager analytics;
     private static PlotPlugin instance;
     private PlotManager plotManager;
     
     @Override
     public void onEnable() {
         instance = this;
+
+        analytics = AnalyticsManager.builder()
+                .plugin(this)
+                .apiKey("27a3bc001bc66ce302fa39ae9b2e08ac")
+                .updateInterval(60) // 5 minuti
+                .build();
+        analytics.start();
 
         
         // Print banner
@@ -69,6 +82,10 @@ public class PlotPlugin extends JavaPlugin {
     
     @Override
     public void onDisable() {
+        if (analytics != null) {
+            analytics.stop();
+        }
+
         if (plotManager != null) {
             plotManager.saveAll();
         }
@@ -99,4 +116,7 @@ public class PlotPlugin extends JavaPlugin {
     public PlotManager getPlotManager() {
         return plotManager;
     }
+
+
+
 }

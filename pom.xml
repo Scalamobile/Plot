@@ -6,7 +6,7 @@
 
     <groupId>com.scala</groupId>
     <artifactId>plot</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <packaging>jar</packaging>
 
     <name>Plot</name>
@@ -42,6 +42,13 @@
             <version>3.1.0</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.scala</groupId>
+            <artifactId>ScalaAnalytics</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -62,6 +69,10 @@
                 <version>3.5.0</version>
                 <configuration>
                     <relocations>
+                        <relocation>
+                            <pattern>com.scala.scalaAnalytics</pattern>
+                            <shadedPattern>tuo.package.libs.scalaAnalytics</shadedPattern>
+                        </relocation>
                         <relocation>
                             <pattern>org.bstats</pattern>
                             <shadedPattern>com.scala.plot.bstats</shadedPattern>
