@@ -1,12 +1,17 @@
 package com.scala.plot.commands;
 
 import com.scala.plot.PlotPlugin;
+import com.scala.plot.managers.WorldEditManager;
 import com.scala.plot.model.Plot;
 import com.scala.plot.model.PlotFlag;
+import com.scala.plot.utils.SchedulerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -20,9 +25,15 @@ import java.util.UUID;
 public class PlotCommand implements CommandExecutor, TabCompleter {
     
     private final PlotPlugin plugin;
+    private final WorldEditManager worldEditManager;
     
     public PlotCommand(PlotPlugin plugin) {
         this.plugin = plugin;
+        this.worldEditManager = new WorldEditManager(plugin);
+    }
+    
+    public WorldEditManager getWorldEditManager() {
+        return worldEditManager;
     }
     
     @Override
@@ -85,6 +96,45 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
                 }
                 handleAdmin(player, args);
                 break;
+            case "pos1":
+                handlePos1(player);
+                break;
+            case "pos2":
+                handlePos2(player);
+                break;
+            case "set":
+                if (args.length < 2) {
+                    player.sendMessage(ChatColor.RED + "Usage: /plot set <material>");
+                    return true;
+                }
+                handleSet(player, args[1]);
+                break;
+            case "walls":
+                if (args.length < 2) {
+                    player.sendMessage(ChatColor.RED + "Usage: /plot walls <material>");
+                    return true;
+                }
+                handleWalls(player, args[1]);
+                break;
+            case "fill":
+                if (args.length < 2) {
+                    player.sendMessage(ChatColor.RED + "Usage: /plot fill <material>");
+                    return true;
+                }
+                handleFill(player, args[1]);
+                break;
+            case "copy":
+                handleCopy(player);
+                break;
+            case "paste":
+                handlePaste(player);
+                break;
+            case "undo":
+                handleUndo(player);
+                break;
+            case "wand":
+                handleWand(player);
+                break;
             default:
                 sendHelp(player);
                 break;
@@ -112,10 +162,10 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
         plugin.getPlotManager().savePlots();
         
         Location center = plugin.getPlotManager().getPlotCenter(nearestPlot.getId());
-        player.teleport(center);
-        
-        player.sendMessage(ChatColor.GREEN + "Plot " + nearestPlot.getId() + " claimed successfully!");
-        player.sendMessage(ChatColor.GRAY + "You have been teleported to your plot.");
+        SchedulerUtil.teleportAsync(plugin, player, center, () -> {
+            player.sendMessage(ChatColor.GREEN + "Plot " + nearestPlot.getId() + " claimed successfully!");
+            player.sendMessage(ChatColor.GRAY + "You have been teleported to your plot.");
+        });
     }
     
     private void handleInfo(Player player) {
@@ -277,9 +327,9 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
         
         Plot plot = playerPlots.get(0);
         Location center = plugin.getPlotManager().getPlotCenter(plot.getId());
-        player.teleport(center);
-        
-        player.sendMessage(ChatColor.GREEN + "Teleported to your plot!");
+        SchedulerUtil.teleportAsync(plugin, player, center, () -> {
+            player.sendMessage(ChatColor.GREEN + "Teleported to your plot!");
+        });
     }
     
     private void handleAdmin(Player player, String[] args) {
@@ -353,6 +403,186 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(ChatColor.GREEN + "Plot deleted and reset!");
     }
     
+    private void handlePos1(Player player) {
+        Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
+        
+        if (plot == null || !plot.canBuild(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You can only set positions in your own plot!");
+            return;
+        }
+        
+        worldEditManager.setPos1(player, player.getLocation());
+        player.sendMessage(ChatColor.GREEN + "Position 1 set to " + 
+            player.getLocation().getBlockX() + ", " + 
+            player.getLocation().getBlockY() + ", " + 
+            player.getLocation().getBlockZ());
+    }
+    
+    private void handlePos2(Player player) {
+        Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
+        
+        if (plot == null || !plot.canBuild(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You can only set positions in your own plot!");
+            return;
+        }
+        
+        worldEditManager.setPos2(player, player.getLocation());
+        player.sendMessage(ChatColor.GREEN + "Position 2 set to " + 
+            player.getLocation().getBlockX() + ", " + 
+            player.getLocation().getBlockY() + ", " + 
+            player.getLocation().getBlockZ());
+        
+        if (worldEditManager.hasSelection(player)) {
+            int size = worldEditManager.getSelectionSize(player);
+            player.sendMessage(ChatColor.GRAY + "Selection size: " + size + " blocks");
+        }
+    }
+    
+    private void handleSet(Player player, String materialName) {
+        Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
+        
+        if (plot == null || !plot.canBuild(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You can only use WorldEdit commands in your own plot!");
+            return;
+        }
+        
+        if (!worldEditManager.hasSelection(player)) {
+            player.sendMessage(ChatColor.RED + "You need to select an area first! Use /plot pos1 and /plot pos2");
+            return;
+        }
+        
+        if (!worldEditManager.isSelectionInPlot(player, plot)) {
+            player.sendMessage(ChatColor.RED + "Your selection must be entirely within your plot!");
+            return;
+        }
+        
+        Material material;
+        try {
+            material = Material.valueOf(materialName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            player.sendMessage(ChatColor.RED + "Invalid material: " + materialName);
+            return;
+        }
+        
+        int count = worldEditManager.setBlocks(player, material);
+        player.sendMessage(ChatColor.GREEN + "Set " + count + " blocks to " + material.name());
+    }
+    
+    private void handleWalls(Player player, String materialName) {
+        Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
+        
+        if (plot == null || !plot.canBuild(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You can only use this command in your own plot!");
+            return;
+        }
+        
+        Material material;
+        try {
+            material = Material.valueOf(materialName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            player.sendMessage(ChatColor.RED + "Invalid material: " + materialName);
+            return;
+        }
+        
+        player.sendMessage(ChatColor.YELLOW + "Setting plot walls... This may take a moment.");
+        int count = worldEditManager.setWalls(player, plot, material);
+        player.sendMessage(ChatColor.GREEN + "Set " + count + " blocks to " + material.name());
+    }
+    
+    private void handleFill(Player player, String materialName) {
+        Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
+        
+        if (plot == null || !plot.canBuild(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You can only use this command in your own plot!");
+            return;
+        }
+        
+        Material material;
+        try {
+            material = Material.valueOf(materialName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            player.sendMessage(ChatColor.RED + "Invalid material: " + materialName);
+            return;
+        }
+        
+        player.sendMessage(ChatColor.YELLOW + "Filling plot... This may take a moment.");
+        int count = worldEditManager.fillPlot(player, plot, material);
+        player.sendMessage(ChatColor.GREEN + "Filled " + count + " blocks with " + material.name());
+    }
+    
+    private void handleCopy(Player player) {
+        Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
+        
+        if (plot == null || !plot.canBuild(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You can only use WorldEdit commands in your own plot!");
+            return;
+        }
+        
+        if (!worldEditManager.hasSelection(player)) {
+            player.sendMessage(ChatColor.RED + "You need to select an area first! Use /plot pos1 and /plot pos2");
+            return;
+        }
+        
+        if (!worldEditManager.isSelectionInPlot(player, plot)) {
+            player.sendMessage(ChatColor.RED + "Your selection must be entirely within your plot!");
+            return;
+        }
+        
+        worldEditManager.copy(player);
+        int size = worldEditManager.getSelectionSize(player);
+        player.sendMessage(ChatColor.GREEN + "Copied " + size + " blocks to clipboard");
+    }
+    
+    private void handlePaste(Player player) {
+        Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
+        
+        if (plot == null || !plot.canBuild(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You can only paste in your own plot!");
+            return;
+        }
+        
+        int count = worldEditManager.paste(player, player.getLocation());
+        if (count == 0) {
+            player.sendMessage(ChatColor.RED + "Your clipboard is empty! Use /plot copy first.");
+        } else {
+            player.sendMessage(ChatColor.GREEN + "Pasted " + count + " blocks");
+        }
+    }
+    
+    private void handleUndo(Player player) {
+        Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
+        
+        if (plot == null || !plot.canBuild(player.getUniqueId())) {
+            player.sendMessage(ChatColor.RED + "You can only undo in your own plot!");
+            return;
+        }
+        
+        if (worldEditManager.undo(player)) {
+            player.sendMessage(ChatColor.GREEN + "Undo successful!");
+        } else {
+            player.sendMessage(ChatColor.RED + "Nothing to undo!");
+        }
+    }
+    
+    private void handleWand(Player player) {
+        // Create the wand item
+        ItemStack wand = new ItemStack(Material.STICK);
+        ItemMeta meta = wand.getItemMeta();
+        
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.GOLD + "Plot Wand");
+            List<String> lore = new ArrayList<>();
+            lore.add(ChatColor.GRAY + "Left click: Set position 1");
+            lore.add(ChatColor.GRAY + "Right click: Set position 2");
+            meta.setLore(lore);
+            wand.setItemMeta(meta);
+        }
+        
+        player.getInventory().addItem(wand);
+        player.sendMessage(ChatColor.GREEN + "You received the Plot Wand!");
+        player.sendMessage(ChatColor.GRAY + "Left click to set position 1, right click to set position 2");
+    }
+    
     private void sendHelp(Player player) {
         player.sendMessage(ChatColor.GOLD + "=== Plot Commands ===");
         player.sendMessage(ChatColor.YELLOW + "/plot claim" + ChatColor.GRAY + " - Claim a plot (limit: 1 per player)");
@@ -362,6 +592,16 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(ChatColor.YELLOW + "/plot remove <player>" + ChatColor.GRAY + " - Remove a player from your plot");
         player.sendMessage(ChatColor.YELLOW + "/plot flag set <flag> <value>" + ChatColor.GRAY + " - Set plot flags");
         player.sendMessage(ChatColor.YELLOW + "/plot reset" + ChatColor.GRAY + " - Reset your plot");
+        player.sendMessage(ChatColor.GOLD + "=== WorldEdit Commands ===");
+        player.sendMessage(ChatColor.YELLOW + "/plot pos1" + ChatColor.GRAY + " - Set first position");
+        player.sendMessage(ChatColor.YELLOW + "/plot pos2" + ChatColor.GRAY + " - Set second position");
+        player.sendMessage(ChatColor.YELLOW + "/plot set <material>" + ChatColor.GRAY + " - Set selected area to material");
+        player.sendMessage(ChatColor.YELLOW + "/plot walls <material>" + ChatColor.GRAY + " - Set plot walls");
+        player.sendMessage(ChatColor.YELLOW + "/plot fill <material>" + ChatColor.GRAY + " - Fill entire plot");
+        player.sendMessage(ChatColor.YELLOW + "/plot copy" + ChatColor.GRAY + " - Copy selection");
+        player.sendMessage(ChatColor.YELLOW + "/plot paste" + ChatColor.GRAY + " - Paste copied blocks");
+        player.sendMessage(ChatColor.YELLOW + "/plot undo" + ChatColor.GRAY + " - Undo last action");
+        player.sendMessage(ChatColor.YELLOW + "/plot wand" + ChatColor.GRAY + " - Get the selection wand");
         if (player.hasPermission("plot.admin")) {
             player.sendMessage(ChatColor.YELLOW + "/plot admin" + ChatColor.GRAY + " - Admin commands");
         }
@@ -379,7 +619,8 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
         List<String> completions = new ArrayList<>();
         
         if (args.length == 1) {
-            completions.addAll(Arrays.asList("claim", "tp", "info", "add", "remove", "flag", "reset"));
+            completions.addAll(Arrays.asList("claim", "tp", "info", "add", "remove", "flag", "reset",
+                "pos1", "pos2", "set", "walls", "fill", "copy", "paste", "undo", "wand"));
             if (sender.hasPermission("plot.admin")) {
                 completions.add("admin");
             }
@@ -392,6 +633,12 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
                 completions.add("set");
             } else if (args[0].equalsIgnoreCase("admin") && sender.hasPermission("plot.admin")) {
                 completions.addAll(Arrays.asList("reset", "setowner", "delete"));
+            } else if (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("walls") || 
+                       args[0].equalsIgnoreCase("fill")) {
+                // Add common materials
+                completions.addAll(Arrays.asList("STONE", "GRASS_BLOCK", "DIRT", "COBBLESTONE", 
+                    "WOOD", "GLASS", "SAND", "GRAVEL", "GOLD_BLOCK", "IRON_BLOCK", 
+                    "DIAMOND_BLOCK", "EMERALD_BLOCK", "QUARTZ_BLOCK", "BRICK", "STONE_BRICKS"));
             }
         } else if (args.length == 3) {
             if (args[0].equalsIgnoreCase("flag") && args[1].equalsIgnoreCase("set")) {

@@ -5,6 +5,7 @@ import com.scala.plot.generator.PlotWorldGenerator;
 import com.scala.plot.listeners.PlayerMoveListener;
 import com.scala.plot.listeners.BlockListener;
 import com.scala.plot.listeners.VoidListener;
+import com.scala.plot.listeners.WandListener;
 import com.scala.plot.listeners.WorldListener;
 import com.scala.plot.managers.PlotManager;
 import com.scala.plot.VersionChecker;
@@ -68,6 +69,7 @@ public class PlotPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BlockListener(this), this);
         getServer().getPluginManager().registerEvents(new WorldListener(this), this);
         getServer().getPluginManager().registerEvents(new VoidListener(this), this);
+        getServer().getPluginManager().registerEvents(new WandListener(this, plotCommand.getWorldEditManager()), this);
         
         // Configure main world if already loaded
         if (getServer().getWorld("world") != null) {

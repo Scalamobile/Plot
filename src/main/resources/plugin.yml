@@ -5,11 +5,12 @@ api-version: '1.21'
 author: scala
 description: Plot management plugin with custom world generation
 load: STARTUP
+folia-supported: true
 
 commands:
   plot:
     description: Main plot command
-    usage: /plot <claim|tp|info|add|remove|flag|reset>
+    usage: /plot <claim|tp|info|add|remove|flag|reset|pos1|pos2|set|walls|fill|copy|paste|undo|wand>
     aliases: [p]
 
 permissions:
@@ -33,6 +34,36 @@ permissions:
     default: true
   plot.reset:
     description: Allows resetting plots
+    default: true
+  plot.worldedit:
+    description: Allows using WorldEdit commands in plots
+    default: true
+  plot.worldedit.pos1:
+    description: Allows setting position 1
+    default: true
+  plot.worldedit.pos2:
+    description: Allows setting position 2
+    default: true
+  plot.worldedit.set:
+    description: Allows setting blocks in selection
+    default: true
+  plot.worldedit.walls:
+    description: Allows setting plot walls
+    default: true
+  plot.worldedit.fill:
+    description: Allows filling entire plot
+    default: true
+  plot.worldedit.copy:
+    description: Allows copying selections
+    default: true
+  plot.worldedit.paste:
+    description: Allows pasting selections
+    default: true
+  plot.worldedit.undo:
+    description: Allows undoing WorldEdit actions
+    default: true
+  plot.worldedit.wand:
+    description: Allows getting the selection wand
     default: true
   plot.admin:
     description: Admin permissions for plots

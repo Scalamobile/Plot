@@ -1,13 +1,14 @@
 package com.scala.plot.listeners;
 
 import com.scala.plot.PlotPlugin;
+import com.scala.plot.utils.SchedulerUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.ChatColor;
 
 public class VoidListener implements Listener {
     private final PlotPlugin plugin;
@@ -27,7 +28,8 @@ public class VoidListener implements Listener {
 
         if (y < 0) {
             player.sendMessage(ChatColor.RED + "You cant go to the void");
-            player.teleport(new Location(Bukkit.getWorld("world"), x - 1, 64, z));
+            Location safeLoc = new Location(Bukkit.getWorld("world"), x - 1, 64, z);
+            SchedulerUtil.teleportAsync(plugin, player, safeLoc, null);
         }
     }
 }
