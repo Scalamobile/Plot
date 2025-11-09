@@ -2,6 +2,8 @@
 
 Plugin for plot management with custom world generation.
 
+Join the [discord](https://discord.gg/m3s6Ey3EcM) server to receive any help!
+
 ## Features
 
 - **100x100 plot world generation**: Plots are automatically generated when new chunks are created
