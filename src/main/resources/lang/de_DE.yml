@@ -1,0 +1,87 @@
+console_execution: "Nur Spieler können diesen Befehl benutzen!"
+add_command_usage: "Verwendung: /plot add <Spieler>"
+remove_command_usage: "Verwendung: /plot remove <Spieler>"
+flag_command_usage: "Verwendung: /plot flag set <Flag> <Wert>"
+no_perms: "Du hast keine Berechtigung, Admin-Befehle zu verwenden!"
+set_command_usage: "Verwendung: /plot set <Material>"
+walls_command_usage: "Verwendung: /plot walls <Material>"
+claim_already_owned: "Du besitzt bereits ein Plot! Nutze /plot tp, um dich zu teleportieren."
+claim_no_plot: "Keine verfügbaren Plots in der Nähe!"
+claim_success: "Plot {plot_id} erfolgreich beansprucht!"
+claim_teleport: "Du wurdest zu deinem Plot teleportiert."
+fill_command_usage: "Verwendung: /plot fill <Material>"
+
+info_no_plot: "Du befindest dich auf keinem Plot!"
+info_owner_none: "Besitzer: Niemand (nicht beansprucht)"
+info_owner: "Besitzer: {owner}"
+info_members: "Mitglieder: {members}"
+info_flags: "Flags:"
+info_flag_true: "{flag}: wahr"
+info_flag_false: "{flag}: falsch"
+
+add_player_not_found: "Spieler nicht gefunden!"
+add_player_already_member: "Dieser Spieler ist bereits Mitglied!"
+add_player_success_owner: "{player} wurde zum Plot hinzugefügt!"
+add_player_success_target: "Du wurdest von {owner} zum Plot {plot_id} hinzugefügt"
+
+remove_player_not_found: "Spieler nicht gefunden!"
+remove_player_not_member: "Dieser Spieler ist kein Mitglied!"
+remove_player_success_owner: "{player} wurde vom Plot entfernt!"
+remove_player_success_target: "Du wurdest vom Plot {plot_id} entfernt"
+
+flag_invalid_flag: "Ungültige Flag! Verfügbar: break, place"
+flag_invalid_value: "Ungültiger Wert! Benutze true oder false."
+flag_set_success: "Flag {flag} auf {value} gesetzt"
+
+reset_no_plot: "Du befindest dich auf keinem Plot!"
+reset_no_perms: "Du kannst diesen Plot nicht zurücksetzen!"
+reset_success: "Der Plot wurde zurückgesetzt!"
+
+tp_no_plot: "Du besitzt kein Plot! Nutze /plot claim, um eins zu bekommen."
+tp_success: "Zum Plot teleportiert!"
+
+admin_usage_setowner: "Verwendung: /plot admin setowner <Spieler>"
+admin_reset_success: "Plot vom Admin zurückgesetzt!"
+admin_setowner_success_owner: "Plot-Besitzer auf {player} gesetzt"
+admin_setowner_success_target: "Du hast das Eigentum am Plot {plot_id} vom Admin erhalten!"
+admin_delete_success: "Plot gelöscht und zurückgesetzt!"
+admin_delete_no_owner: "Dieser Plot ist bereits unbeansprucht!"
+
+pos1_no_perms: "Du kannst Positionen nur in deinem Plot setzen!"
+pos1_set: "Position 1 gesetzt auf X:{x}, Y:{y}, Z:{z}"
+
+pos2_no_perms: "Du kannst Positionen nur in deinem Plot setzen!"
+pos2_set: "Position 2 gesetzt auf X:{x}, Y:{y}, Z:{z}"
+pos2_selection_size: "Auswahlgröße: {size} Blöcke"
+
+fill_no_perms: "Diesen Befehl kannst du nur in deinem Plot benutzen!"
+fill_invalid_material: "Ungültiges Material: {material}"
+fill_starting: "Plot wird gefüllt... das kann einen Moment dauern."
+fill_success: "{count} Blöcke mit {material} gefüllt"
+
+walls_no_perms: "Diesen Befehl kannst du nur in deinem Plot benutzen!"
+walls_invalid_material: "Ungültiges Material: {material}"
+walls_starting: "Plot-Wände werden gesetzt... das kann einen Moment dauern."
+walls_success: "{count} Blöcke als {material} gesetzt"
+
+set_no_perms: "Du kannst WorldEdit nur in deinem Plot benutzen!"
+set_no_selection: "Du musst zuerst einen Bereich auswählen! Nutze /plot pos1 und /plot pos2"
+set_out_of_plot: "Die Auswahl muss vollständig innerhalb des Plots liegen!"
+set_invalid_material: "Ungültiges Material: {material}"
+set_success: "{count} Blöcke als {material} gesetzt"
+
+copy_no_perms: "Du kannst WorldEdit nur in deinem Plot benutzen!"
+copy_no_selection: "Du musst zuerst einen Bereich auswählen! Nutze /plot pos1 und /plot pos2"
+copy_out_of_plot: "Die Auswahl muss vollständig innerhalb des Plots liegen!"
+copy_success: "{count} Blöcke in die Zwischenablage kopiert"
+
+paste_no_perms: "Du kannst nur in deinem Plot einfügen!"
+paste_empty_clipboard: "Die Zwischenablage ist leer! Benutze zuerst /plot copy."
+paste_success: "{count} Blöcke eingefügt"
+
+undo_no_perms: "Du kannst Undo nur in deinem Plot durchführen!"
+undo_success: "Undo erfolgreich!"
+undo_nothing: "Nichts zum Rückgängig machen!"
+
+wand_received: "Du hast den Plot-Zauberstab erhalten!"
+wand_instructions: "Linksklick: pos1, Rechtsklick: pos2"

@@ -1,0 +1,87 @@
+console_execution: "Seuls les joueurs peuvent utiliser cette commande !"
+add_command_usage: "Utilisation : /plot add <joueur>"
+remove_command_usage: "Utilisation : /plot remove <joueur>"
+flag_command_usage: "Utilisation : /plot flag set <flag> <valeur>"
+no_perms: "Vous n'avez pas la permission d'utiliser les commandes admin !"
+set_command_usage: "Utilisation : /plot set <matériau>"
+walls_command_usage: "Utilisation : /plot walls <matériau>"
+claim_already_owned: "Vous possédez déjà un plot ! Utilisez /plot tp pour vous téléporter."
+claim_no_plot: "Aucun plot disponible à proximité !"
+claim_success: "Plot {plot_id} réclamé avec succès !"
+claim_teleport: "Vous avez été téléporté à votre plot."
+fill_command_usage: "Utilisation : /plot fill <matériau>"
+
+info_no_plot: "Vous n'êtes sur aucun plot !"
+info_owner_none: "Propriétaire : Aucun (non réclamé)"
+info_owner: "Propriétaire : {owner}"
+info_members: "Membres : {members}"
+info_flags: "Flags :"
+info_flag_true: "{flag} : vrai"
+info_flag_false: "{flag} : faux"
+
+add_player_not_found: "Joueur introuvable !"
+add_player_already_member: "Ce joueur est déjà membre !"
+add_player_success_owner: "{player} a été ajouté au plot !"
+add_player_success_target: "Vous avez été ajouté au plot {plot_id} par {owner}"
+
+remove_player_not_found: "Joueur introuvable !"
+remove_player_not_member: "Ce joueur n'est pas membre !"
+remove_player_success_owner: "{player} a été retiré du plot !"
+remove_player_success_target: "Vous avez été retiré du plot {plot_id}"
+
+flag_invalid_flag: "Flag invalide ! Disponibles : break, place"
+flag_invalid_value: "Valeur invalide ! Utilisez true ou false."
+flag_set_success: "Flag {flag} définie sur {value}"
+
+reset_no_plot: "Vous n'êtes sur aucun plot !"
+reset_no_perms: "Vous ne pouvez pas réinitialiser ce plot !"
+reset_success: "Le plot a été réinitialisé !"
+
+tp_no_plot: "Vous ne possédez pas de plot ! Utilisez /plot claim pour en obtenir un."
+tp_success: "Téléporté à votre plot !"
+
+admin_usage_setowner: "Utilisation : /plot admin setowner <joueur>"
+admin_reset_success: "Plot réinitialisé par l'admin !"
+admin_setowner_success_owner: "Propriétaire du plot défini sur {player}"
+admin_setowner_success_target: "Vous avez reçu la propriété du plot {plot_id} de l'admin !"
+admin_delete_success: "Plot supprimé et réinitialisé !"
+admin_delete_no_owner: "Ce plot est déjà non réclamé !"
+
+pos1_no_perms: "Vous ne pouvez définir les positions que dans votre plot !"
+pos1_set: "Position 1 définie sur X:{x}, Y:{y}, Z:{z}"
+
+pos2_no_perms: "Vous ne pouvez définir les positions que dans votre plot !"
+pos2_set: "Position 2 définie sur X:{x}, Y:{y}, Z:{z}"
+pos2_selection_size: "Taille de la sélection : {size} blocs"
+
+fill_no_perms: "Vous ne pouvez utiliser cette commande que dans votre plot !"
+fill_invalid_material: "Matériau invalide : {material}"
+fill_starting: "Remplissage du plot en cours... cela peut prendre un moment."
+fill_success: "{count} blocs remplis avec {material}"
+
+walls_no_perms: "Vous ne pouvez utiliser cette commande que dans votre plot !"
+walls_invalid_material: "Matériau invalide : {material}"
+walls_starting: "Création des murs du plot en cours... cela peut prendre un moment."
+walls_success: "{count} blocs définis comme {material}"
+
+set_no_perms: "Vous ne pouvez utiliser WorldEdit que dans votre plot !"
+set_no_selection: "Vous devez d'abord sélectionner une zone ! Utilisez /plot pos1 et /plot pos2"
+set_out_of_plot: "La sélection doit être entièrement dans le plot !"
+set_invalid_material: "Matériau invalide : {material}"
+set_success: "{count} blocs définis comme {material}"
+
+copy_no_perms: "Vous ne pouvez utiliser WorldEdit que dans votre plot !"
+copy_no_selection: "Vous devez d'abord sélectionner une zone ! Utilisez /plot pos1 et /plot pos2"
+copy_out_of_plot: "La sélection doit être entièrement dans le plot !"
+copy_success: "{count} blocs copiés dans le presse-papiers"
+
+paste_no_perms: "Vous ne pouvez coller que dans votre plot !"
+paste_empty_clipboard: "Le presse-papiers est vide ! Utilisez d'abord /plot copy."
+paste_success: "{count} blocs collés"
+
+undo_no_perms: "Vous ne pouvez faire undo que dans votre plot !"
+undo_success: "Undo réussi !"
+undo_nothing: "Rien à annuler !"
+
+wand_received: "Vous avez reçu la Baguette du Plot !"
+wand_instructions: "Clic gauche : pos1, Clic droit : pos2"

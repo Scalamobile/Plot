@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.command.CommandExecutor;
@@ -23,33 +24,40 @@ import java.util.List;
 import java.util.UUID;
 
 public class PlotCommand implements CommandExecutor, TabCompleter {
-    
+
     private final PlotPlugin plugin;
     private final WorldEditManager worldEditManager;
-    
+    private FileConfiguration lang;
+
     public PlotCommand(PlotPlugin plugin) {
         this.plugin = plugin;
         this.worldEditManager = new WorldEditManager(plugin);
+        this.lang = plugin.getLang();
     }
-    
+
+    public String t(String path) {
+        return ChatColor.translateAlternateColorCodes('&', lang.getString(path, path));
+    }
+
     public WorldEditManager getWorldEditManager() {
         return worldEditManager;
     }
-    
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "Only players can use this command!");
+            sender.sendMessage(ChatColor.RED + t("console_execution"));
             return true;
         }
-        
+
         Player player = (Player) sender;
-        
+
         if (args.length == 0) {
             sendHelp(player);
             return true;
         }
-        
+
         switch (args[0].toLowerCase()) {
             case "claim":
                 handleClaim(player);
@@ -59,21 +67,21 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
                 break;
             case "add":
                 if (args.length < 2) {
-                    player.sendMessage(ChatColor.RED + "Usage: /plot add <player>");
+                    player.sendMessage(ChatColor.RED + t("add_command_usage"));
                     return true;
                 }
                 handleAdd(player, args[1]);
                 break;
             case "remove":
                 if (args.length < 2) {
-                    player.sendMessage(ChatColor.RED + "Usage: /plot remove <player>");
+                    player.sendMessage(ChatColor.RED + t("remove_command_usage"));
                     return true;
                 }
                 handleRemove(player, args[1]);
                 break;
             case "flag":
                 if (args.length < 4 || !args[1].equalsIgnoreCase("set")) {
-                    player.sendMessage(ChatColor.RED + "Usage: /plot flag set <flag> <value>");
+                    player.sendMessage(ChatColor.RED + t("flag_command_usage"));
                     return true;
                 }
                 handleFlag(player, args[2], args[3]);
@@ -87,7 +95,7 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
                 break;
             case "admin":
                 if (!player.hasPermission("plot.admin")) {
-                    player.sendMessage(ChatColor.RED + "You don't have permission to use admin commands!");
+                    player.sendMessage(ChatColor.RED + t("no_perms"));
                     return true;
                 }
                 if (args.length < 2) {
@@ -104,21 +112,21 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
                 break;
             case "set":
                 if (args.length < 2) {
-                    player.sendMessage(ChatColor.RED + "Usage: /plot set <material>");
+                    player.sendMessage(ChatColor.RED + t("set_command_usage"));
                     return true;
                 }
                 handleSet(player, args[1]);
                 break;
             case "walls":
                 if (args.length < 2) {
-                    player.sendMessage(ChatColor.RED + "Usage: /plot walls <material>");
+                    player.sendMessage(ChatColor.RED + t("walls_command_usage"));
                     return true;
                 }
                 handleWalls(player, args[1]);
                 break;
             case "fill":
                 if (args.length < 2) {
-                    player.sendMessage(ChatColor.RED + "Usage: /plot fill <material>");
+                    player.sendMessage(ChatColor.RED + t("fill_command_usage"));
                     return true;
                 }
                 handleFill(player, args[1]);
@@ -139,199 +147,202 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
                 sendHelp(player);
                 break;
         }
-        
+
         return true;
     }
-    
+
     private void handleClaim(Player player) {
-        // Check if player already has a plot
         List<Plot> playerPlots = plugin.getPlotManager().getPlayerPlots(player.getUniqueId());
         if (!playerPlots.isEmpty()) {
-            player.sendMessage(ChatColor.RED + "You already have a plot! Use /plot tp to teleport to it.");
+            player.sendMessage(ChatColor.RED + t("claim_already_owned"));
             return;
         }
-        
+
         Plot nearestPlot = plugin.getPlotManager().findNearestUnclaimedPlot(player.getLocation());
-        
+
         if (nearestPlot == null) {
-            player.sendMessage(ChatColor.RED + "No unclaimed plots available nearby!");
+            player.sendMessage(ChatColor.RED + t("claim_no_plot"));
             return;
         }
-        
+
         nearestPlot.setOwner(player.getUniqueId());
         plugin.getPlotManager().savePlots();
-        
+
         Location center = plugin.getPlotManager().getPlotCenter(nearestPlot.getId());
         SchedulerUtil.teleportAsync(plugin, player, center, () -> {
-            player.sendMessage(ChatColor.GREEN + "Plot " + nearestPlot.getId() + " claimed successfully!");
-            player.sendMessage(ChatColor.GRAY + "You have been teleported to your plot.");
+            player.sendMessage(ChatColor.GREEN + t("claim_success").replace("{plot_id}", String.valueOf(nearestPlot.getId())));
+            player.sendMessage(ChatColor.GRAY + t("claim_teleport"));
         });
     }
-    
+
     private void handleInfo(Player player) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null) {
-            player.sendMessage(ChatColor.RED + "You are not standing in a plot!");
+            player.sendMessage(ChatColor.RED + t("info_no_plot"));
             return;
         }
-        
+
         player.sendMessage(ChatColor.GOLD + "=== Plot Info ===");
         player.sendMessage(ChatColor.YELLOW + "ID: " + ChatColor.WHITE + plot.getId());
-        
+
         if (plot.hasOwner()) {
             String ownerName = Bukkit.getOfflinePlayer(plot.getOwner()).getName();
-            player.sendMessage(ChatColor.YELLOW + "Owner: " + ChatColor.WHITE + ownerName);
-            
+            player.sendMessage(ChatColor.YELLOW + t("info_owner").replace("{owner}", ownerName));
+
             if (!plot.getMembers().isEmpty()) {
                 StringBuilder members = new StringBuilder();
                 for (UUID memberId : plot.getMembers()) {
                     if (members.length() > 0) members.append(", ");
                     members.append(Bukkit.getOfflinePlayer(memberId).getName());
                 }
-                player.sendMessage(ChatColor.YELLOW + "Members: " + ChatColor.WHITE + members);
+                player.sendMessage(ChatColor.YELLOW + t("info_members").replace("{members}", members.toString()));
             }
-            
-            player.sendMessage(ChatColor.YELLOW + "Flags:");
+
+            player.sendMessage(ChatColor.YELLOW + t("info_flags"));
             for (PlotFlag flag : PlotFlag.values()) {
                 boolean value = plot.getFlag(flag);
-                player.sendMessage(ChatColor.GRAY + "  - " + flag.getName() + ": " + 
-                    (value ? ChatColor.GREEN + "true" : ChatColor.RED + "false"));
+                player.sendMessage(ChatColor.GRAY + "  - " + flag.getName() + ": " +
+                        (value ? ChatColor.GREEN + t("info_flag_true").replace("{flag}", flag.getName())
+                                : ChatColor.RED + t("info_flag_false").replace("{flag}", flag.getName())));
             }
+
         } else {
-            player.sendMessage(ChatColor.YELLOW + "Owner: " + ChatColor.WHITE + "None (unclaimed)");
+            player.sendMessage(ChatColor.YELLOW + t("info_owner_none"));
         }
     }
-    
+
     private void handleAdd(Player player, String targetName) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null) {
-            player.sendMessage(ChatColor.RED + "You are not standing in a plot!");
+            player.sendMessage(ChatColor.RED + t("info_no_plot"));
             return;
         }
-        
+
         if (!plot.isOwner(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You don't own this plot!");
+            player.sendMessage(ChatColor.RED + t("reset_no_perms"));
             return;
         }
-        
+
         Player target = Bukkit.getPlayer(targetName);
         if (target == null) {
-            player.sendMessage(ChatColor.RED + "Player not found!");
+            player.sendMessage(ChatColor.RED + t("add_player_not_found"));
             return;
         }
-        
+
         if (plot.isMember(target.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "This player is already a member!");
+            player.sendMessage(ChatColor.RED + t("add_player_already_member"));
             return;
         }
-        
+
         plot.addMember(target.getUniqueId());
         plugin.getPlotManager().savePlots();
-        
-        player.sendMessage(ChatColor.GREEN + target.getName() + " has been added to the plot!");
-        target.sendMessage(ChatColor.GREEN + "You have been added to plot " + plot.getId() + " by " + player.getName());
+
+        player.sendMessage(ChatColor.GREEN + t("add_player_success_owner").replace("{player}", target.getName()));
+        target.sendMessage(ChatColor.GREEN + t("add_player_success_target")
+                .replace("{plot_id}", String.valueOf(plot.getId()))
+                .replace("{owner}", player.getName()));
     }
-    
+
     private void handleRemove(Player player, String targetName) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null) {
-            player.sendMessage(ChatColor.RED + "You are not standing in a plot!");
+            player.sendMessage(ChatColor.RED + t("info_no_plot"));
             return;
         }
-        
+
         if (!plot.isOwner(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You don't own this plot!");
+            player.sendMessage(ChatColor.RED + t("reset_no_perms"));
             return;
         }
-        
+
         Player target = Bukkit.getPlayer(targetName);
         if (target == null) {
-            player.sendMessage(ChatColor.RED + "Player not found!");
+            player.sendMessage(ChatColor.RED + t("remove_player_not_found"));
             return;
         }
-        
+
         if (!plot.isMember(target.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "This player is not a member!");
+            player.sendMessage(ChatColor.RED + t("remove_player_not_member"));
             return;
         }
-        
+
         plot.removeMember(target.getUniqueId());
         plugin.getPlotManager().savePlots();
-        
-        player.sendMessage(ChatColor.GREEN + target.getName() + " has been removed from the plot!");
-        target.sendMessage(ChatColor.YELLOW + "You have been removed from plot " + plot.getId());
+
+        player.sendMessage(ChatColor.GREEN + t("remove_player_success_owner").replace("{player}", target.getName()));
+        target.sendMessage(ChatColor.YELLOW + t("remove_player_success_target").replace("{plot_id}", String.valueOf(plot.getId())));
     }
-    
+
     private void handleFlag(Player player, String flagName, String value) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null) {
-            player.sendMessage(ChatColor.RED + "You are not standing in a plot!");
+            player.sendMessage(ChatColor.RED + t("info_no_plot"));
             return;
         }
-        
+
         if (!plot.isOwner(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You don't own this plot!");
+            player.sendMessage(ChatColor.RED + t("reset_no_perms"));
             return;
         }
-        
+
         PlotFlag flag = PlotFlag.fromString(flagName);
         if (flag == null) {
-            player.sendMessage(ChatColor.RED + "Invalid flag! Available flags: break, place");
+            player.sendMessage(ChatColor.RED + t("flag_invalid_flag"));
             return;
         }
-        
+
         boolean boolValue;
         if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes")) {
             boolValue = true;
         } else if (value.equalsIgnoreCase("false") || value.equalsIgnoreCase("no")) {
             boolValue = false;
         } else {
-            player.sendMessage(ChatColor.RED + "Invalid value! Use true or false.");
+            player.sendMessage(ChatColor.RED + t("flag_invalid_value"));
             return;
         }
-        
+
         plot.setFlag(flag, boolValue);
         plugin.getPlotManager().savePlots();
-        
-        player.sendMessage(ChatColor.GREEN + "Flag " + flag.getName() + " set to " + boolValue);
+
+        player.sendMessage(ChatColor.GREEN + t("flag_set_success")
+                .replace("{flag}", flag.getName())
+                .replace("{value}", String.valueOf(boolValue)));
     }
-    
+
     private void handleReset(Player player) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null) {
-            player.sendMessage(ChatColor.RED + "You are not standing in a plot!");
+            player.sendMessage(ChatColor.RED + t("reset_no_plot"));
             return;
         }
-        
+
         if (!plot.isOwner(player.getUniqueId()) && !player.hasPermission("plot.admin")) {
-            player.sendMessage(ChatColor.RED + "You don't own this plot!");
+            player.sendMessage(ChatColor.RED + t("reset_no_perms"));
             return;
         }
-        
+
         plugin.getPlotManager().resetPlot(plot);
-        player.sendMessage(ChatColor.GREEN + "Plot has been reset!");
+        player.sendMessage(ChatColor.GREEN + t("reset_success"));
     }
-    
+
     private void handleTeleport(Player player) {
         List<Plot> playerPlots = plugin.getPlotManager().getPlayerPlots(player.getUniqueId());
-        
+
         if (playerPlots.isEmpty()) {
-            player.sendMessage(ChatColor.RED + "You don't have a plot! Use /plot claim to get one.");
+            player.sendMessage(ChatColor.RED + t("tp_no_plot"));
             return;
         }
-        
+
         Plot plot = playerPlots.get(0);
         Location center = plugin.getPlotManager().getPlotCenter(plot.getId());
-        SchedulerUtil.teleportAsync(plugin, player, center, () -> {
-            player.sendMessage(ChatColor.GREEN + "Teleported to your plot!");
-        });
+        SchedulerUtil.teleportAsync(plugin, player, center, () -> player.sendMessage(ChatColor.GREEN + t("tp_success")));
     }
-    
+
     private void handleAdmin(Player player, String[] args) {
         switch (args[1].toLowerCase()) {
             case "reset":
@@ -339,7 +350,7 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
                 break;
             case "setowner":
                 if (args.length < 3) {
-                    player.sendMessage(ChatColor.RED + "Usage: /plot admin setowner <player>");
+                    player.sendMessage(ChatColor.RED + t("admin_usage_setowner"));
                     return;
                 }
                 handleAdminSetOwner(player, args[2]);
@@ -352,223 +363,223 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
                 break;
         }
     }
-    
+
     private void handleAdminReset(Player player) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null) {
-            player.sendMessage(ChatColor.RED + "You are not standing in a plot!");
+            player.sendMessage(ChatColor.RED + t("info_no_plot"));
             return;
         }
-        
+
         plugin.getPlotManager().resetPlot(plot);
-        player.sendMessage(ChatColor.GREEN + "Plot has been reset by admin!");
+        player.sendMessage(ChatColor.GREEN + t("admin_reset_success"));
     }
-    
+
     private void handleAdminSetOwner(Player player, String targetName) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null) {
-            player.sendMessage(ChatColor.RED + "You are not standing in a plot!");
+            player.sendMessage(ChatColor.RED + t("info_no_plot"));
             return;
         }
-        
+
         Player target = Bukkit.getPlayer(targetName);
         if (target == null) {
-            player.sendMessage(ChatColor.RED + "Player not found!");
+            player.sendMessage(ChatColor.RED + t("add_player_not_found"));
             return;
         }
-        
+
         plot.setOwner(target.getUniqueId());
         plugin.getPlotManager().savePlots();
-        
-        player.sendMessage(ChatColor.GREEN + "Plot owner set to " + target.getName());
-        target.sendMessage(ChatColor.GREEN + "You have been given ownership of plot " + plot.getId() + " by an admin!");
+
+        player.sendMessage(ChatColor.GREEN + t("admin_setowner_success_owner").replace("{player}", target.getName()));
+        target.sendMessage(ChatColor.GREEN + t("admin_setowner_success_target")
+                .replace("{plot_id}", String.valueOf(plot.getId())));
     }
-    
+
     private void handleAdminDelete(Player player) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null) {
-            player.sendMessage(ChatColor.RED + "You are not standing in a plot!");
+            player.sendMessage(ChatColor.RED + t("info_no_plot"));
             return;
         }
-        
+
         if (!plot.hasOwner()) {
-            player.sendMessage(ChatColor.RED + "This plot is already unclaimed!");
+            player.sendMessage(ChatColor.RED + t("admin_delete_no_owner"));
             return;
         }
-        
+
         plugin.getPlotManager().resetPlot(plot);
-        player.sendMessage(ChatColor.GREEN + "Plot deleted and reset!");
+        player.sendMessage(ChatColor.GREEN + t("admin_delete_success"));
     }
-    
+
     private void handlePos1(Player player) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null || !plot.canBuild(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You can only set positions in your own plot!");
+            player.sendMessage(ChatColor.RED + t("pos1_no_perms"));
             return;
         }
-        
+
         worldEditManager.setPos1(player, player.getLocation());
-        player.sendMessage(ChatColor.GREEN + "Position 1 set to " + 
-            player.getLocation().getBlockX() + ", " + 
-            player.getLocation().getBlockY() + ", " + 
-            player.getLocation().getBlockZ());
+        player.sendMessage(ChatColor.GREEN + t("pos1_set")
+                .replace("{x}", String.valueOf(player.getLocation().getBlockX()))
+                .replace("{y}", String.valueOf(player.getLocation().getBlockY()))
+                .replace("{z}", String.valueOf(player.getLocation().getBlockZ())));
     }
-    
+
     private void handlePos2(Player player) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null || !plot.canBuild(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You can only set positions in your own plot!");
+            player.sendMessage(ChatColor.RED + t("pos2_no_perms"));
             return;
         }
-        
+
         worldEditManager.setPos2(player, player.getLocation());
-        player.sendMessage(ChatColor.GREEN + "Position 2 set to " + 
-            player.getLocation().getBlockX() + ", " + 
-            player.getLocation().getBlockY() + ", " + 
-            player.getLocation().getBlockZ());
-        
+        player.sendMessage(ChatColor.GREEN + t("pos2_set")
+                .replace("{x}", String.valueOf(player.getLocation().getBlockX()))
+                .replace("{y}", String.valueOf(player.getLocation().getBlockY()))
+                .replace("{z}", String.valueOf(player.getLocation().getBlockZ())));
+
         if (worldEditManager.hasSelection(player)) {
             int size = worldEditManager.getSelectionSize(player);
-            player.sendMessage(ChatColor.GRAY + "Selection size: " + size + " blocks");
+            player.sendMessage(ChatColor.GRAY + t("pos2_selection_size").replace("{size}", String.valueOf(size)));
         }
     }
-    
+
     private void handleSet(Player player, String materialName) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null || !plot.canBuild(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You can only use WorldEdit commands in your own plot!");
+            player.sendMessage(ChatColor.RED + t("set_no_perms"));
             return;
         }
-        
+
         if (!worldEditManager.hasSelection(player)) {
-            player.sendMessage(ChatColor.RED + "You need to select an area first! Use /plot pos1 and /plot pos2");
+            player.sendMessage(ChatColor.RED + t("set_no_selection"));
             return;
         }
-        
+
         if (!worldEditManager.isSelectionInPlot(player, plot)) {
-            player.sendMessage(ChatColor.RED + "Your selection must be entirely within your plot!");
+            player.sendMessage(ChatColor.RED + t("set_out_of_plot"));
             return;
         }
-        
+
         Material material;
         try {
             material = Material.valueOf(materialName.toUpperCase());
         } catch (IllegalArgumentException e) {
-            player.sendMessage(ChatColor.RED + "Invalid material: " + materialName);
+            player.sendMessage(ChatColor.RED + t("set_invalid_material").replace("{material}", materialName));
             return;
         }
-        
+
         int count = worldEditManager.setBlocks(player, material);
-        player.sendMessage(ChatColor.GREEN + "Set " + count + " blocks to " + material.name());
+        player.sendMessage(ChatColor.GREEN + t("set_success").replace("{count}", String.valueOf(count)).replace("{material}", material.name()));
     }
-    
+
     private void handleWalls(Player player, String materialName) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null || !plot.canBuild(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You can only use this command in your own plot!");
+            player.sendMessage(ChatColor.RED + t("walls_no_perms"));
             return;
         }
-        
+
         Material material;
         try {
             material = Material.valueOf(materialName.toUpperCase());
         } catch (IllegalArgumentException e) {
-            player.sendMessage(ChatColor.RED + "Invalid material: " + materialName);
+            player.sendMessage(ChatColor.RED + t("walls_invalid_material").replace("{material}", materialName));
             return;
         }
-        
-        player.sendMessage(ChatColor.YELLOW + "Setting plot walls... This may take a moment.");
+
+        player.sendMessage(ChatColor.YELLOW + t("walls_starting"));
         int count = worldEditManager.setWalls(player, plot, material);
-        player.sendMessage(ChatColor.GREEN + "Set " + count + " blocks to " + material.name());
+        player.sendMessage(ChatColor.GREEN + t("walls_success").replace("{count}", String.valueOf(count)).replace("{material}", material.name()));
     }
-    
+
     private void handleFill(Player player, String materialName) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null || !plot.canBuild(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You can only use this command in your own plot!");
+            player.sendMessage(ChatColor.RED + t("fill_no_perms"));
             return;
         }
-        
+
         Material material;
         try {
             material = Material.valueOf(materialName.toUpperCase());
         } catch (IllegalArgumentException e) {
-            player.sendMessage(ChatColor.RED + "Invalid material: " + materialName);
+            player.sendMessage(ChatColor.RED + t("fill_invalid_material").replace("{material}", materialName));
             return;
         }
-        
-        player.sendMessage(ChatColor.YELLOW + "Filling plot... This may take a moment.");
+
+        player.sendMessage(ChatColor.YELLOW + t("fill_starting"));
         int count = worldEditManager.fillPlot(player, plot, material);
-        player.sendMessage(ChatColor.GREEN + "Filled " + count + " blocks with " + material.name());
+        player.sendMessage(ChatColor.GREEN + t("fill_success").replace("{count}", String.valueOf(count)).replace("{material}", material.name()));
     }
-    
+
     private void handleCopy(Player player) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null || !plot.canBuild(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You can only use WorldEdit commands in your own plot!");
+            player.sendMessage(ChatColor.RED + t("copy_no_perms"));
             return;
         }
-        
+
         if (!worldEditManager.hasSelection(player)) {
-            player.sendMessage(ChatColor.RED + "You need to select an area first! Use /plot pos1 and /plot pos2");
+            player.sendMessage(ChatColor.RED + t("copy_no_selection"));
             return;
         }
-        
+
         if (!worldEditManager.isSelectionInPlot(player, plot)) {
-            player.sendMessage(ChatColor.RED + "Your selection must be entirely within your plot!");
+            player.sendMessage(ChatColor.RED + t("copy_out_of_plot"));
             return;
         }
-        
+
         worldEditManager.copy(player);
         int size = worldEditManager.getSelectionSize(player);
-        player.sendMessage(ChatColor.GREEN + "Copied " + size + " blocks to clipboard");
+        player.sendMessage(ChatColor.GREEN + t("copy_success").replace("{count}", String.valueOf(size)));
     }
-    
+
     private void handlePaste(Player player) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null || !plot.canBuild(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You can only paste in your own plot!");
+            player.sendMessage(ChatColor.RED + t("paste_no_perms"));
             return;
         }
-        
+
         int count = worldEditManager.paste(player, player.getLocation());
         if (count == 0) {
-            player.sendMessage(ChatColor.RED + "Your clipboard is empty! Use /plot copy first.");
+            player.sendMessage(ChatColor.RED + t("paste_empty_clipboard"));
         } else {
-            player.sendMessage(ChatColor.GREEN + "Pasted " + count + " blocks");
+            player.sendMessage(ChatColor.GREEN + t("paste_success").replace("{count}", String.valueOf(count)));
         }
     }
-    
+
     private void handleUndo(Player player) {
         Plot plot = plugin.getPlotManager().getPlotAt(player.getLocation());
-        
+
         if (plot == null || !plot.canBuild(player.getUniqueId())) {
-            player.sendMessage(ChatColor.RED + "You can only undo in your own plot!");
+            player.sendMessage(ChatColor.RED + t("undo_no_perms"));
             return;
         }
-        
+
         if (worldEditManager.undo(player)) {
-            player.sendMessage(ChatColor.GREEN + "Undo successful!");
+            player.sendMessage(ChatColor.GREEN + t("undo_success"));
         } else {
-            player.sendMessage(ChatColor.RED + "Nothing to undo!");
+            player.sendMessage(ChatColor.RED + t("undo_nothing"));
         }
     }
-    
+
     private void handleWand(Player player) {
-        // Create the wand item
         ItemStack wand = new ItemStack(Material.STICK);
         ItemMeta meta = wand.getItemMeta();
-        
+
         if (meta != null) {
             meta.setDisplayName(ChatColor.GOLD + "Plot Wand");
             List<String> lore = new ArrayList<>();
@@ -577,50 +588,50 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
             meta.setLore(lore);
             wand.setItemMeta(meta);
         }
-        
+
         player.getInventory().addItem(wand);
-        player.sendMessage(ChatColor.GREEN + "You received the Plot Wand!");
-        player.sendMessage(ChatColor.GRAY + "Left click to set position 1, right click to set position 2");
+        player.sendMessage(ChatColor.GREEN + t("wand_received"));
+        player.sendMessage(ChatColor.GRAY + t("wand_instructions"));
     }
-    
+
     private void sendHelp(Player player) {
         player.sendMessage(ChatColor.GOLD + "=== Plot Commands ===");
-        player.sendMessage(ChatColor.YELLOW + "/plot claim" + ChatColor.GRAY + " - Claim a plot (limit: 1 per player)");
-        player.sendMessage(ChatColor.YELLOW + "/plot tp" + ChatColor.GRAY + " - Teleport to your plot");
-        player.sendMessage(ChatColor.YELLOW + "/plot info" + ChatColor.GRAY + " - View plot information");
-        player.sendMessage(ChatColor.YELLOW + "/plot add <player>" + ChatColor.GRAY + " - Add a player to your plot");
-        player.sendMessage(ChatColor.YELLOW + "/plot remove <player>" + ChatColor.GRAY + " - Remove a player from your plot");
-        player.sendMessage(ChatColor.YELLOW + "/plot flag set <flag> <value>" + ChatColor.GRAY + " - Set plot flags");
-        player.sendMessage(ChatColor.YELLOW + "/plot reset" + ChatColor.GRAY + " - Reset your plot");
+        player.sendMessage(ChatColor.YELLOW + "/plot claim" + ChatColor.GRAY + " - " + t("claim_already_owned"));
+        player.sendMessage(ChatColor.YELLOW + "/plot tp" + ChatColor.GRAY + " - Teletrasportati al tuo plot");
+        player.sendMessage(ChatColor.YELLOW + "/plot info" + ChatColor.GRAY + " - Visualizza info del plot");
+        player.sendMessage(ChatColor.YELLOW + "/plot add <player>" + ChatColor.GRAY + " - Aggiungi un giocatore al plot");
+        player.sendMessage(ChatColor.YELLOW + "/plot remove <player>" + ChatColor.GRAY + " - Rimuovi un giocatore dal plot");
+        player.sendMessage(ChatColor.YELLOW + "/plot flag set <flag> <value>" + ChatColor.GRAY + " - Imposta flag del plot");
+        player.sendMessage(ChatColor.YELLOW + "/plot reset" + ChatColor.GRAY + " - Resetta il plot");
         player.sendMessage(ChatColor.GOLD + "=== WorldEdit Commands ===");
-        player.sendMessage(ChatColor.YELLOW + "/plot pos1" + ChatColor.GRAY + " - Set first position");
-        player.sendMessage(ChatColor.YELLOW + "/plot pos2" + ChatColor.GRAY + " - Set second position");
-        player.sendMessage(ChatColor.YELLOW + "/plot set <material>" + ChatColor.GRAY + " - Set selected area to material");
-        player.sendMessage(ChatColor.YELLOW + "/plot walls <material>" + ChatColor.GRAY + " - Set plot walls");
-        player.sendMessage(ChatColor.YELLOW + "/plot fill <material>" + ChatColor.GRAY + " - Fill entire plot");
-        player.sendMessage(ChatColor.YELLOW + "/plot copy" + ChatColor.GRAY + " - Copy selection");
-        player.sendMessage(ChatColor.YELLOW + "/plot paste" + ChatColor.GRAY + " - Paste copied blocks");
-        player.sendMessage(ChatColor.YELLOW + "/plot undo" + ChatColor.GRAY + " - Undo last action");
-        player.sendMessage(ChatColor.YELLOW + "/plot wand" + ChatColor.GRAY + " - Get the selection wand");
+        player.sendMessage(ChatColor.YELLOW + "/plot pos1" + ChatColor.GRAY + " - Imposta posizione 1");
+        player.sendMessage(ChatColor.YELLOW + "/plot pos2" + ChatColor.GRAY + " - Imposta posizione 2");
+        player.sendMessage(ChatColor.YELLOW + "/plot set <material>" + ChatColor.GRAY + " - Imposta area selezionata");
+        player.sendMessage(ChatColor.YELLOW + "/plot walls <material>" + ChatColor.GRAY + " - Imposta muri del plot");
+        player.sendMessage(ChatColor.YELLOW + "/plot fill <material>" + ChatColor.GRAY + " - Riempie il plot");
+        player.sendMessage(ChatColor.YELLOW + "/plot copy" + ChatColor.GRAY + " - Copia selezione");
+        player.sendMessage(ChatColor.YELLOW + "/plot paste" + ChatColor.GRAY + " - Incolla selezione");
+        player.sendMessage(ChatColor.YELLOW + "/plot undo" + ChatColor.GRAY + " - Undo ultimo comando");
+        player.sendMessage(ChatColor.YELLOW + "/plot wand" + ChatColor.GRAY + " - Ottieni bacchetta selezione");
         if (player.hasPermission("plot.admin")) {
-            player.sendMessage(ChatColor.YELLOW + "/plot admin" + ChatColor.GRAY + " - Admin commands");
+            player.sendMessage(ChatColor.YELLOW + "/plot admin" + ChatColor.GRAY + " - Comandi admin");
         }
     }
-    
+
     private void sendAdminHelp(Player player) {
         player.sendMessage(ChatColor.GOLD + "=== Plot Admin Commands ===");
-        player.sendMessage(ChatColor.YELLOW + "/plot admin reset" + ChatColor.GRAY + " - Reset any plot");
-        player.sendMessage(ChatColor.YELLOW + "/plot admin setowner <player>" + ChatColor.GRAY + " - Set plot owner");
-        player.sendMessage(ChatColor.YELLOW + "/plot admin delete" + ChatColor.GRAY + " - Delete and reset a plot");
+        player.sendMessage(ChatColor.YELLOW + "/plot admin reset" + ChatColor.GRAY + " - Resetta qualsiasi plot");
+        player.sendMessage(ChatColor.YELLOW + "/plot admin setowner <player>" + ChatColor.GRAY + " - Imposta proprietario");
+        player.sendMessage(ChatColor.YELLOW + "/plot admin delete" + ChatColor.GRAY + " - Elimina e resetta plot");
     }
-    
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
-        
+
         if (args.length == 1) {
             completions.addAll(Arrays.asList("claim", "tp", "info", "add", "remove", "flag", "reset",
-                "pos1", "pos2", "set", "walls", "fill", "copy", "paste", "undo", "wand"));
+                    "pos1", "pos2", "set", "walls", "fill", "copy", "paste", "undo", "wand"));
             if (sender.hasPermission("plot.admin")) {
                 completions.add("admin");
             }
@@ -633,12 +644,11 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
                 completions.add("set");
             } else if (args[0].equalsIgnoreCase("admin") && sender.hasPermission("plot.admin")) {
                 completions.addAll(Arrays.asList("reset", "setowner", "delete"));
-            } else if (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("walls") || 
-                       args[0].equalsIgnoreCase("fill")) {
-                // Add common materials
-                completions.addAll(Arrays.asList("STONE", "GRASS_BLOCK", "DIRT", "COBBLESTONE", 
-                    "WOOD", "GLASS", "SAND", "GRAVEL", "GOLD_BLOCK", "IRON_BLOCK", 
-                    "DIAMOND_BLOCK", "EMERALD_BLOCK", "QUARTZ_BLOCK", "BRICK", "STONE_BRICKS"));
+            } else if (args[0].equalsIgnoreCase("set") || args[0].equalsIgnoreCase("walls") ||
+                    args[0].equalsIgnoreCase("fill")) {
+                completions.addAll(Arrays.asList("STONE", "GRASS_BLOCK", "DIRT", "COBBLESTONE",
+                        "WOOD", "GLASS", "SAND", "GRAVEL", "GOLD_BLOCK", "IRON_BLOCK",
+                        "DIAMOND_BLOCK", "EMERALD_BLOCK", "QUARTZ_BLOCK", "BRICK", "STONE_BRICKS"));
             }
         } else if (args.length == 3) {
             if (args[0].equalsIgnoreCase("flag") && args[1].equalsIgnoreCase("set")) {
@@ -653,7 +663,7 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
             completions.add("true");
             completions.add("false");
         }
-        
+
         return completions;
     }
 }

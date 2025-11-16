@@ -1,0 +1,87 @@
+console_execution: "Solo i giocatori possono usare questo comando!"
+add_command_usage: "Utilizzo: /plot add <player>"
+remove_command_usage: "Utilizzo: /plot remove <player>"
+flag_command_usage: "Utilizzo: /plot flag set <flag> <value>"
+no_perms: "Non hai il permesso di utilizzare i comandi admin!"
+set_command_usage: "Utilizzo: /plot set <material>"
+walls_command_usage: "Utilizzo: /plot walls <material>"
+claim_already_owned: "Hai già un plot! Usa /plot tp per teletrasportarti."
+claim_no_plot: "Nessun plot disponibile nelle vicinanze!"
+claim_success: "Plot {plot_id} reclamato con successo!"
+claim_teleport: "Sei stato teletrasportato al tuo plot."
+fill_command_usage: "Utilizzo: /plot fill <materiale>"
+
+info_no_plot: "Non sei su nessun plot!"
+info_owner_none: "Proprietario: Nessuno (non reclamato)"
+info_owner: "Proprietario: {owner}"
+info_members: "Membri: {members}"
+info_flags: "Flag:"
+info_flag_true: "{flag}: vero"
+info_flag_false: "{flag}: falso"
+
+add_player_not_found: "Giocatore non trovato!"
+add_player_already_member: "Questo giocatore è già un membro!"
+add_player_success_owner: "{player} è stato aggiunto al plot!"
+add_player_success_target: "Sei stato aggiunto al plot {plot_id} da {owner}"
+
+remove_player_not_found: "Giocatore non trovato!"
+remove_player_not_member: "Questo giocatore non è un membro!"
+remove_player_success_owner: "{player} è stato rimosso dal plot!"
+remove_player_success_target: "Sei stato rimosso dal plot {plot_id}"
+
+flag_invalid_flag: "Flag non valida! Disponibili: break, place"
+flag_invalid_value: "Valore non valido! Usa true o false."
+flag_set_success: "Flag {flag} impostata su {value}"
+
+reset_no_plot: "Non sei su nessun plot!"
+reset_no_perms: "Non puoi resettare questo plot!"
+reset_success: "Il plot è stato resettato!"
+
+tp_no_plot: "Non hai un plot! Usa /plot claim per ottenerne uno."
+tp_success: "Teletrasportato al tuo plot!"
+
+admin_usage_setowner: "Uso: /plot admin setowner <player>"
+admin_reset_success: "Plot resettato dall'admin!"
+admin_setowner_success_owner: "Proprietario del plot impostato su {player}"
+admin_setowner_success_target: "Hai ricevuto la proprietà del plot {plot_id} dall'admin!"
+admin_delete_success: "Plot eliminato e resettato!"
+admin_delete_no_owner: "Questo plot è già non reclamato!"
+
+pos1_no_perms: "Puoi impostare le posizioni solo nel tuo plot!"
+pos1_set: "Posizione 1 impostata su X:{x}, Y:{y}, Z:{z}"
+
+pos2_no_perms: "Puoi impostare le posizioni solo nel tuo plot!"
+pos2_set: "Posizione 2 impostata su X:{x}, Y:{y}, Z:{z}"
+pos2_selection_size: "Dimensione selezione: {size} blocchi"
+
+fill_no_perms: "Puoi usare questo comando solo nel tuo plot!"
+fill_invalid_material: "Materiale non valido: {material}"
+fill_starting: "Riempimento del plot... questo potrebbe richiedere un momento."
+fill_success: "Riempiti {count} blocchi con {material}"
+
+walls_no_perms: "Puoi usare questo comando solo nel tuo plot!"
+walls_invalid_material: "Materiale non valido: {material}"
+walls_starting: "Impostazione dei muri del plot... questo potrebbe richiedere un momento."
+walls_success: "Impostati {count} blocchi come {material}"
+
+set_no_perms: "Puoi usare WorldEdit solo nel tuo plot!"
+set_no_selection: "Devi prima selezionare un'area! Usa /plot pos1 e /plot pos2"
+set_out_of_plot: "La selezione deve essere interamente all'interno del plot!"
+set_invalid_material: "Materiale non valido: {material}"
+set_success: "Impostati {count} blocchi come {material}"
+
+copy_no_perms: "Puoi usare WorldEdit solo nel tuo plot!"
+copy_no_selection: "Devi prima selezionare un'area! Usa /plot pos1 e /plot pos2"
+copy_out_of_plot: "La selezione deve essere interamente all'interno del plot!"
+copy_success: "Copiati {count} blocchi negli appunti"
+
+paste_no_perms: "Puoi incollare solo nel tuo plot!"
+paste_empty_clipboard: "Gli appunti sono vuoti! Usa /plot copy prima."
+paste_success: "Incollati {count} blocchi"
+
+undo_no_perms: "Puoi fare undo solo nel tuo plot!"
+undo_success: "Undo effettuato con successo!"
+undo_nothing: "Niente da annullare!"
+
+wand_received: "Hai ricevuto la Bacchetta del Plot!"
+wand_instructions: "Clic sinistro: pos1, Clic destro: pos2"

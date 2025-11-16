@@ -1,0 +1,87 @@
+console_execution: "Only players can use this command!"
+add_command_usage: "Usage: /plot add <player>"
+remove_command_usage: "Usage: /plot remove <player>"
+flag_command_usage: "Usage: /plot flag set <flag> <value>"
+no_perms: "You do not have permission to use admin commands!"
+set_command_usage: "Usage: /plot set <material>"
+walls_command_usage: "Usage: /plot walls <material>"
+claim_already_owned: "You already own a plot! Use /plot tp to teleport."
+claim_no_plot: "No available plots nearby!"
+claim_success: "Plot {plot_id} successfully claimed!"
+claim_teleport: "You have been teleported to your plot."
+fill_command_usage: "Usage: /plot fill <material>"
+
+info_no_plot: "You are not on any plot!"
+info_owner_none: "Owner: None (unclaimed)"
+info_owner: "Owner: {owner}"
+info_members: "Members: {members}"
+info_flags: "Flags:"
+info_flag_true: "{flag}: true"
+info_flag_false: "{flag}: false"
+
+add_player_not_found: "Player not found!"
+add_player_already_member: "This player is already a member!"
+add_player_success_owner: "{player} has been added to the plot!"
+add_player_success_target: "You have been added to plot {plot_id} by {owner}"
+
+remove_player_not_found: "Player not found!"
+remove_player_not_member: "This player is not a member!"
+remove_player_success_owner: "{player} has been removed from the plot!"
+remove_player_success_target: "You have been removed from plot {plot_id}"
+
+flag_invalid_flag: "Invalid flag! Available: break, place"
+flag_invalid_value: "Invalid value! Use true or false."
+flag_set_success: "Flag {flag} set to {value}"
+
+reset_no_plot: "You are not on any plot!"
+reset_no_perms: "You cannot reset this plot!"
+reset_success: "The plot has been reset!"
+
+tp_no_plot: "You do not own a plot! Use /plot claim to get one."
+tp_success: "Teleported to your plot!"
+
+admin_usage_setowner: "Usage: /plot admin setowner <player>"
+admin_reset_success: "Plot reset by admin!"
+admin_setowner_success_owner: "Plot owner set to {player}"
+admin_setowner_success_target: "You have received ownership of plot {plot_id} from the admin!"
+admin_delete_success: "Plot deleted and reset!"
+admin_delete_no_owner: "This plot is already unclaimed!"
+
+pos1_no_perms: "You can only set positions in your plot!"
+pos1_set: "Position 1 set to X:{x}, Y:{y}, Z:{z}"
+
+pos2_no_perms: "You can only set positions in your plot!"
+pos2_set: "Position 2 set to X:{x}, Y:{y}, Z:{z}"
+pos2_selection_size: "Selection size: {size} blocks"
+
+fill_no_perms: "You can only use this command in your plot!"
+fill_invalid_material: "Invalid material: {material}"
+fill_starting: "Filling the plot... this may take a moment."
+fill_success: "Filled {count} blocks with {material}"
+
+walls_no_perms: "You can only use this command in your plot!"
+walls_invalid_material: "Invalid material: {material}"
+walls_starting: "Setting plot walls... this may take a moment."
+walls_success: "Set {count} blocks as {material}"
+
+set_no_perms: "You can only use WorldEdit in your plot!"
+set_no_selection: "You must select an area first! Use /plot pos1 and /plot pos2"
+set_out_of_plot: "The selection must be completely inside the plot!"
+set_invalid_material: "Invalid material: {material}"
+set_success: "Set {count} blocks as {material}"
+
+copy_no_perms: "You can only use WorldEdit in your plot!"
+copy_no_selection: "You must select an area first! Use /plot pos1 and /plot pos2"
+copy_out_of_plot: "The selection must be completely inside the plot!"
+copy_success: "Copied {count} blocks to the clipboard"
+
+paste_no_perms: "You can only paste in your plot!"
+paste_empty_clipboard: "The clipboard is empty! Use /plot copy first."
+paste_success: "Pasted {count} blocks"
+
+undo_no_perms: "You can only undo in your plot!"
+undo_success: "Undo successful!"
+undo_nothing: "Nothing to undo!"
+
+wand_received: "You have received the Plot Wand!"
+wand_instructions: "Left click: pos1, Right click: pos2"

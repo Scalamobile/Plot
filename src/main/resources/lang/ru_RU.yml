@@ -1,0 +1,87 @@
+console_execution: "Только игроки могут использовать эту команду!"
+add_command_usage: "Использование: /plot add <игрок>"
+remove_command_usage: "Использование: /plot remove <игрок>"
+flag_command_usage: "Использование: /plot flag set <флаг> <значение>"
+no_perms: "У вас нет прав на использование админ-команд!"
+set_command_usage: "Использование: /plot set <материал>"
+walls_command_usage: "Использование: /plot walls <материал>"
+claim_already_owned: "У вас уже есть участок! Используйте /plot tp для телепортации."
+claim_no_plot: "Нет доступных участков поблизости!"
+claim_success: "Участок {plot_id} успешно захвачен!"
+claim_teleport: "Вы были телепортированы на свой участок."
+fill_command_usage: "Использование: /plot fill <материал>"
+
+info_no_plot: "Вы не находитесь на участке!"
+info_owner_none: "Владелец: Никто (не захвачен)"
+info_owner: "Владелец: {owner}"
+info_members: "Участники: {members}"
+info_flags: "Флаги:"
+info_flag_true: "{flag}: правда"
+info_flag_false: "{flag}: ложь"
+
+add_player_not_found: "Игрок не найден!"
+add_player_already_member: "Этот игрок уже является членом!"
+add_player_success_owner: "{player} был добавлен на участок!"
+add_player_success_target: "Вы были добавлены на участок {plot_id} игроком {owner}"
+
+remove_player_not_found: "Игрок не найден!"
+remove_player_not_member: "Этот игрок не является членом!"
+remove_player_success_owner: "{player} был удалён с участка!"
+remove_player_success_target: "Вы были удалены с участка {plot_id}"
+
+flag_invalid_flag: "Неверный флаг! Доступно: break, place"
+flag_invalid_value: "Неверное значение! Используйте true или false."
+flag_set_success: "Флаг {flag} установлен на {value}"
+
+reset_no_plot: "Вы не находитесь на участке!"
+reset_no_perms: "Вы не можете сбросить этот участок!"
+reset_success: "Участок был сброшен!"
+
+tp_no_plot: "У вас нет участка! Используйте /plot claim, чтобы получить один."
+tp_success: "Телепортировано на ваш участок!"
+
+admin_usage_setowner: "Использование: /plot admin setowner <игрок>"
+admin_reset_success: "Участок сброшен админом!"
+admin_setowner_success_owner: "Владелец участка установлен на {player}"
+admin_setowner_success_target: "Вы получили право собственности на участок {plot_id} от администратора!"
+admin_delete_success: "Участок удалён и сброшен!"
+admin_delete_no_owner: "Этот участок уже не захвачен!"
+
+pos1_no_perms: "Вы можете устанавливать позиции только на своём участке!"
+pos1_set: "Позиция 1 установлена на X:{x}, Y:{y}, Z:{z}"
+
+pos2_no_perms: "Вы можете устанавливать позиции только на своём участке!"
+pos2_set: "Позиция 2 установлена на X:{x}, Y:{y}, Z:{z}"
+pos2_selection_size: "Размер выделения: {size} блоков"
+
+fill_no_perms: "Вы можете использовать эту команду только на своём участке!"
+fill_invalid_material: "Неверный материал: {material}"
+fill_starting: "Заполнение участка... это может занять некоторое время."
+fill_success: "Заполнено {count} блоков материалом {material}"
+
+walls_no_perms: "Вы можете использовать эту команду только на своём участке!"
+walls_invalid_material: "Неверный материал: {material}"
+walls_starting: "Создание стен участка... это может занять некоторое время."
+walls_success: "Установлено {count} блоков как {material}"
+
+set_no_perms: "Вы можете использовать WorldEdit только на своём участке!"
+set_no_selection: "Сначала выберите область! Используйте /plot pos1 и /plot pos2"
+set_out_of_plot: "Выделение должно быть полностью внутри участка!"
+set_invalid_material: "Неверный материал: {material}"
+set_success: "Установлено {count} блоков как {material}"
+
+copy_no_perms: "Вы можете использовать WorldEdit только на своём участке!"
+copy_no_selection: "Сначала выберите область! Используйте /plot pos1 и /plot pos2"
+copy_out_of_plot: "Выделение должно быть полностью внутри участка!"
+copy_success: "Скопировано {count} блоков в буфер обмена"
+
+paste_no_perms: "Вы можете вставлять только на своём участке!"
+paste_empty_clipboard: "Буфер обмена пуст! Сначала используйте /plot copy."
+paste_success: "Вставлено {count} блоков"
+
+undo_no_perms: "Вы можете делать undo только на своём участке!"
+undo_success: "Undo выполнен успешно!"
+undo_nothing: "Нечего отменять!"
+
+wand_received: "Вы получили Палочку участка!"
+wand_instructions: "Левый клик: pos1, Правый клик: pos2"
