@@ -1,4 +1,5 @@
 console_execution: "Seuls les joueurs peuvent utiliser cette commande !"
+not_plot_world: "&cVous ne pouvez utiliser les commandes de terrain que dans le monde de terrain !"
 add_command_usage: "Utilisation : /plot add <joueur>"
 remove_command_usage: "Utilisation : /plot remove <joueur>"
 flag_command_usage: "Utilisation : /plot flag set <flag> <valeur>"

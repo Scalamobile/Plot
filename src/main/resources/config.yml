@@ -3,6 +3,9 @@
 
 language: en_US
 
+#Set this to the world that is used where the plots are, used in case you use multiverse core
+plot_world: world
+
 
 
 

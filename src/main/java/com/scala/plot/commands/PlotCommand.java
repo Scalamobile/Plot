@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -28,11 +29,13 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
     private final PlotPlugin plugin;
     private final WorldEditManager worldEditManager;
     private FileConfiguration lang;
+    private String plotWorldName;
 
     public PlotCommand(PlotPlugin plugin) {
         this.plugin = plugin;
         this.worldEditManager = new WorldEditManager(plugin);
         this.lang = plugin.getLang();
+        this.plotWorldName = plugin.getConfig().getString("plot_world", "plotworld");
     }
 
     public String t(String path) {
@@ -52,6 +55,11 @@ public class PlotCommand implements CommandExecutor, TabCompleter {
         }
 
         Player player = (Player) sender;
+
+        if (!player.getWorld().getName().equalsIgnoreCase(plotWorldName)) {
+            player.sendMessage(ChatColor.RED + t("not_plot_world"));
+            return true;
+        }
 
         if (args.length == 0) {
             sendHelp(player);

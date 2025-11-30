@@ -1,4 +1,5 @@
 console_execution: "Только игроки могут использовать эту команду!"
+not_plot_world: "&cВы можете использовать команды плота только в мире плотов!"
 add_command_usage: "Использование: /plot add <игрок>"
 remove_command_usage: "Использование: /plot remove <игрок>"
 flag_command_usage: "Использование: /plot flag set <флаг> <значение>"

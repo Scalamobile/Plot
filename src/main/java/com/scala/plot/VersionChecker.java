@@ -28,7 +28,7 @@ public class VersionChecker {
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (!response.body().equals("1.1.4")) {
+            if (!response.body().equals("1.1.5")) {
                 getLogger().warning("[Plot] Update available! Install it from: https://modrinth.com/plugin/plot");
             } else {
                 getLogger().info("[Plot] No update avaiable!");

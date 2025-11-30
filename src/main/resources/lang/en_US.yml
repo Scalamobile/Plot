@@ -1,4 +1,5 @@
 console_execution: "Only players can use this command!"
+not_plot_world: "&cYou can only use plot commands in the plot world!"
 add_command_usage: "Usage: /plot add <player>"
 remove_command_usage: "Usage: /plot remove <player>"
 flag_command_usage: "Usage: /plot flag set <flag> <value>"

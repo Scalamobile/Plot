@@ -1,4 +1,5 @@
 console_execution: "¡Solo los jugadores pueden usar este comando!"
+not_plot_world: "&cSolo puedes usar comandos de parcela en el mundo de parcelas!"
 add_command_usage: "Uso: /plot add <jugador>"
 remove_command_usage: "Uso: /plot remove <jugador>"
 flag_command_usage: "Uso: /plot flag set <flag> <valor>"
